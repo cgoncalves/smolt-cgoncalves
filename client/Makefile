@@ -1,6 +1,7 @@
 PO_FILES=$(wildcard po/*.po)
 MO_FILES=$(patsubst %.po,%.mo,$(PO_FILES))
-CLIENT_PY_FILES=$(wildcard *.py)
+# echo CLIENT_PY_FILES=$(ls -1 *.py | grep -v '^\(__init__\|create_monthly\|getLink\|haldump\|hammer_add\|makeuuid\|starhscale\).py$' | sort)
+CLIENT_PY_FILES=config.py deleteProfile.py fs_util.py gate.py gui.py i18n.py os_detect.py privacypolicy.py scan.py sendProfile.py smolt_config.py smoltFirstBoot.py smoltGui.py smolt.py software.py uuiddb.py
 DIRED_MO_FILES=$(patsubst po/%.mo,mo/%/LC_MESSAGES/$(NAME).mo,$(MO_FILES))
 
 
