@@ -403,7 +403,7 @@ class PubUUIDError(Exception):
     def __str__(self):
         return str(self.message)
 
-class Hardware:
+class _Hardware:
     devices = {}
     def __init__(self):
         try:
@@ -562,7 +562,6 @@ class Hardware:
         debug('smoon server URL: %s' % smoonURL)
 
         serialized_host_obj_machine = serialize(send_host_obj, human=False)
-        serialized_host_obj_human = serialize(send_host_obj, human=True)
         send_host_str = ('uuid=%s&host=' + \
                          serialized_host_obj_machine + \
                          '&token=%s&smolt_protocol=%s') % \
@@ -581,9 +580,10 @@ class Hardware:
             return (1, None, None)
         else:
             try:
-                logdir = '/var/tmp/smolt'
+                serialized_host_obj_human = serialize(send_host_obj, human=True)
+                logdir = '/var/tmp/smolt/client'
                 if not os.path.exists(logdir):
-                    os.mkdir(logdir, 0777)
+                    os.makedirs(logdir, 0777)
                 t = datetime.datetime.today()
                 basename = '%04d-%02d-%02d-%02d-%02d-%02d.json' % \
                     (t.year, t.month, t.day, t.hour, t.minute, t.second)
@@ -700,6 +700,16 @@ class Hardware:
             else:
                 if not ignoreDevice(self.devices[device]):
                     yield VendorID, DeviceID, SubsysVendorID, SubsysDeviceID, Bus, Driver, Type, Description
+
+
+_hardware_instance = None
+def Hardware():
+    """Simple singleton wrapper with lazy initialization"""
+    global _hardware_instance
+    if _hardware_instance == None:
+        _hardware_instance = _Hardware()
+    return _hardware_instance
+
 
 # From RHN Client Tools
 
