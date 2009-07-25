@@ -123,10 +123,19 @@ class SmoltGui(QMainWindow):
 		''' Central Widget '''
 		self.central = QWidget(self)
 		self.mainLayout = QGridLayout()
+		
+		''' Tabs '''
 		self.host_table = gui.HostTable()
-		self.mainLayout.addWidget(self.host_table.get())
 		self.device_table = gui.DeviceTable()
-		self.mainLayout.addWidget(self.device_table.get())
+		self.generalTab = gui.GeneralTab(self.host_table, self.device_table)
+
+		self.distroTab = gui.DistroTab()
+		self.distroInfo = QTextBrowser()
+		self.distroInfo.setReadOnly(True)
+		self.distroTab.addWidget(self.distroInfo)
+
+		self.mainTabWidget = gui.MainTabWidget(self.generalTab, self.distroTab)
+		self.mainLayout.addWidget(self.mainTabWidget)
 		self.central.setLayout(self.mainLayout)
 		self.setCentralWidget(self.central)
  
@@ -150,6 +159,9 @@ class SmoltGui(QMainWindow):
 		self._on_gathering_completed()
 		self.host_table.set_profile(self._gather_thread.hardware)
 		self.device_table.set_profile(self._gather_thread.hardware)
+		self.distro_document = QTextDocument()
+		self.distro_document.setHtml(_('No distribution-specific data yet'))
+		self.distroInfo.setDocument(self.distro_document)
 
 	def _on_system_bus_error(self):
 		self._on_gathering_completed()
