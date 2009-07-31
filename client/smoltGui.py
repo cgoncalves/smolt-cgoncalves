@@ -50,6 +50,11 @@ class GatherThread(QThread):
 			time.sleep(5)
 		try:
 			self.hardware = smolt.Hardware()
+			try:
+				smolt.getPubUUID()
+				self.emit(SIGNAL('smoltPageStatus(PyQt_PyObject)'), True)
+			except:
+				self.emit(SIGNAL('smoltPageStatus(PyQt_PyObject)'), False)
 			self.emit(SIGNAL('profile_ready()'))
 		except smolt.SystemBusError, e:
 			self.error_message = e.message
@@ -202,6 +207,9 @@ class SmoltGui(QMainWindow):
 			self._on_profile_ready)
 		self.connect(self._gather_thread, SIGNAL("system_bus_error()"), \
 			self._on_system_bus_error)
+		self.connect(self._gather_thread, SIGNAL('smoltPageStatus(PyQt_PyObject)'), \
+			self._smoltPageStatus)
+
 		self._gather_thread.start()
 
 	def sendProfile(self):
@@ -214,6 +222,7 @@ class SmoltGui(QMainWindow):
 			self._on_submission_failed)
 		self.connect(self._submit_thread, SIGNAL('submission_completed()'), \
 			self._on_submission_completed)
+
 		self._submit_thread.start()
 
 	def _tear_progress_down(self, success=False):
@@ -244,6 +253,18 @@ class SmoltGui(QMainWindow):
 				Your profile admin password is:<br><i>%(password)s</i>'), 'UTF-8') % \
 					{'url':url, 'password':admin_password},
 				QMessageBox.NoButton, self).exec_()
+
+		self._smoltPageStatus(enable=True)
+
+	def _smoltPageStatus(self, enable=None):
+		if enable != None:
+			self.mySmoltPageAction.setEnabled(enable)
+		else:
+			try:
+				smolt.getPubUUID()
+				self.mySmoltPageAction.setEnabled(True)
+			except smolt.PubUUIDError, e:
+				self.mySmoltPageAction.setEnabled(False)
 
 	def openSmoltPage(self):
  
