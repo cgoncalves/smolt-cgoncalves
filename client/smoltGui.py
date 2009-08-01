@@ -254,17 +254,10 @@ class SmoltGui(QMainWindow):
 					{'url':url, 'password':admin_password},
 				QMessageBox.NoButton, self).exec_()
 
-		self._smoltPageStatus(enable=True)
+		self._smoltPageStatus(True)
 
-	def _smoltPageStatus(self, enable=None):
-		if enable != None:
+	def _smoltPageStatus(self, enable):
 			self.mySmoltPageAction.setEnabled(enable)
-		else:
-			try:
-				smolt.getPubUUID()
-				self.mySmoltPageAction.setEnabled(True)
-			except smolt.PubUUIDError, e:
-				self.mySmoltPageAction.setEnabled(False)
 
 	def openSmoltPage(self):
  
