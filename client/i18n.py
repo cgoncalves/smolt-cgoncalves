@@ -39,4 +39,5 @@ except IndexError:
     locale.setlocale(locale.LC_ALL, 'C')
     t = gettext.translation('smolt', '/usr/share/locale/', fallback=True, languages='en_US')
 
-_ = t.gettext
+def _(str):
+    return unicode(t.gettext(str), 'UTF-8')
