@@ -19,8 +19,8 @@
  
 import sys
 import os
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PySide.QtCore import *
+from PySide.QtGui import *
 from urlparse import urljoin
  
 from i18n import _
@@ -52,9 +52,9 @@ class GatherThread(QThread):
 			self.hardware = smolt.Hardware()
 			try:
 				smolt.getPubUUID()
-				self.emit(SIGNAL('smoltPageStatus(PyQt_PyObject)'), True)
+				self.emit(SIGNAL('smoltPageStatus(bool)'), True)
 			except:
-				self.emit(SIGNAL('smoltPageStatus(PyQt_PyObject)'), False)
+				self.emit(SIGNAL('smoltPageStatus(bool)'), False)
 			self.emit(SIGNAL('profile_ready()'))
 		except smolt.SystemBusError, e:
 			self.error_message = e.message
@@ -164,8 +164,8 @@ class SmoltGui(QMainWindow):
 
 	def _on_profile_ready(self):
 		self._on_gathering_completed()
-		self.host_table.set_profile(self._gather_thread.hardware)
-		self.device_table.set_profile(self._gather_thread.hardware)
+		self.host_table.set_profile(smolt.Hardware())
+		self.device_table.set_profile(smolt.Hardware())
 		self.distro_document = QTextDocument()
 		self.distro_document.setHtml(unicode(_('No distribution-specific data yet'), 'UTF-8'))
 		self.distroInfo.setDocument(self.distro_document)
@@ -207,7 +207,7 @@ class SmoltGui(QMainWindow):
 			self._on_profile_ready)
 		self.connect(self._gather_thread, SIGNAL("system_bus_error()"), \
 			self._on_system_bus_error)
-		self.connect(self._gather_thread, SIGNAL('smoltPageStatus(PyQt_PyObject)'), \
+		self.connect(self._gather_thread, SIGNAL('smoltPageStatus(bool)'), \
 			self._smoltPageStatus)
 
 		self._gather_thread.start()
@@ -215,7 +215,7 @@ class SmoltGui(QMainWindow):
 	def sendProfile(self):
 		self._setup_progress_dialog(label='Sending profile...', force_show=True)
 		# TODO take size of data to submit into account?
-		self._setup_progress_animation(smolt.timeout * 1000)
+		self._setup_progress_animation(int(smolt.timeout * 1000))
 
 		self._submit_thread = SubmitThread(self._gather_thread.hardware)
 		self.connect(self._submit_thread, SIGNAL('submission_failed()'), \
